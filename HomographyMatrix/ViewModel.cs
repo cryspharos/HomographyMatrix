@@ -43,6 +43,59 @@ namespace HomographyMatrix
             }
         }
 
+        private double dstMinX = 0;
+        public double DstMinX
+        {
+            get { return dstMinX; }
+            set
+            {
+                if (dstMinX != value)
+                {
+                    dstMinX = value;
+                    RaisePropertyChanged("DstMinX");
+                }
+            }
+        }
+        private double dstMinY = 0;
+        public double DstMinY
+        {
+            get { return dstMinY; }
+            set
+            {
+                if (dstMinY != value)
+                {
+                    dstMinY = value;
+                    RaisePropertyChanged("DstMinY");
+                }
+            }
+        }
+        private double dstMaxX = 10;
+        public double DstMaxX
+        {
+            get { return dstMaxX; }
+            set
+            {
+                if (dstMaxX != value)
+                {
+                    dstMaxX = value;
+                    RaisePropertyChanged("DstMaxX");
+                }
+            }
+        }
+        private double dstMaxY = 10;
+        public double DstMaxY
+        {
+            get { return dstMaxY; }
+            set
+            {
+                if (dstMaxY != value)
+                {
+                    dstMaxY = value;
+                    RaisePropertyChanged("DstMaxY");
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void RaisePropertyChanged(string propertyName)
