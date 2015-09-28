@@ -16,16 +16,29 @@ namespace HomographyMatrix
         {
             displayArea = displayArea_;
         }
-        private System.Windows.Point mousePos;
-        public System.Windows.Point MousePos
+        private System.Windows.Point srcMousePos;
+        public System.Windows.Point SrcMousePos
         {
-            get { return mousePos; }
+            get { return srcMousePos; }
             set
             {
-                if (mousePos != value)
+                if (srcMousePos != value)
                 {
-                    mousePos = value;
-                    RaisePropertyChanged("MousePos");
+                    srcMousePos = value;
+                    RaisePropertyChanged("SrcMousePos");
+                }
+            }
+        }
+        private System.Windows.Point dstMousePos;
+        public System.Windows.Point DstMousePos
+        {
+            get { return dstMousePos; }
+            set
+            {
+                if (dstMousePos != value)
+                {
+                    dstMousePos = value;
+                    RaisePropertyChanged("DstMousePos");
                 }
             }
         }

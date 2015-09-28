@@ -1,14 +1,20 @@
 ﻿<Window x:Class="HomographyMatrix.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:HomographyMatrix"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         Title="MainWindow" Height="425" Width="525"
         Loaded="Window_Loaded">
     <Window.Resources>
+        <sys:Double x:Key="StrokeThickness">1.5</sys:Double>
         <Style TargetType="Ellipse">
             <Setter Property="Width" Value="10"/>
             <Setter Property="Height" Value="10"/>
-            <Setter Property="Fill" Value="Blue"/>
+            <Setter Property="Fill" Value="{x:Null}"/>
+            <Setter Property="Stroke" Value="Blue"/>
+            <Setter Property="StrokeThickness" Value="{StaticResource StrokeThickness}"/>
         </Style>
+        <local:PointConverter x:Key="PointConverter"/>
     </Window.Resources>
     <DockPanel>
         <Grid DockPanel.Dock="Top" Height="26">
@@ -26,7 +32,9 @@
 
         <Grid DockPanel.Dock="Bottom" Height="24">
             <StatusBar>
-                <StatusBarItem Content="{Binding MousePos}" Width="100"/>
+                <StatusBarItem Content="{Binding Path=SrcMousePos, Converter={StaticResource PointConverter}}" Width="130"/>
+                <Separator/>
+                <StatusBarItem Content="{Binding Path=DstMousePos, Converter={StaticResource PointConverter}}" Width="130"/>
                 <Separator/>
                 <StatusBarItem></StatusBarItem>
             </StatusBar>
@@ -82,33 +90,34 @@
             <GroupBox Grid.Column="0" BorderBrush="Black" Header="Raw">
                 <Viewbox>
                     <Grid Name="srcGrid" Width="400" Height="400" Background="Black">
-                        <Image Name="imgRaw" MouseMove="canvas_MouseMove"/>
+                        <Image Name="imgRaw" MouseMove="imgRaw_MouseMove"/>
                         <Canvas Name="canvas">
                             <Ellipse Name="ellipseLT" Canvas.Left="0" Canvas.Top="0"
-                                         MouseEnter="ellipse_MouseEnter"
-                                         MouseLeave="ellipse_MouseLeave"
-                                         MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
-                                         MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
-                                         MouseMove="Ellipse_MouseMove"/>
+                                MouseEnter="ellipse_MouseEnter"
+                                MouseLeave="ellipse_MouseLeave"
+                                MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
+                                MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
+                                MouseMove="Ellipse_MouseMove" />
                             <Ellipse Name="ellipseRT" Canvas.Right="0" Canvas.Top="0"
-                                         MouseEnter="ellipse_MouseEnter"
-                                         MouseLeave="ellipse_MouseLeave"
-                                         MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
-                                         MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
-                                         MouseMove="Ellipse_MouseMove"/>
+                                MouseEnter="ellipse_MouseEnter"
+                                MouseLeave="ellipse_MouseLeave"
+                                MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
+                                MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
+                                MouseMove="Ellipse_MouseMove"/>
                             <Ellipse Name="ellipseRB" Canvas.Right="0" Canvas.Bottom="0"
-                                         MouseEnter="ellipse_MouseEnter"
-                                         MouseLeave="ellipse_MouseLeave"
-                                         MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
-                                         MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
-                                         MouseMove="Ellipse_MouseMove"/>
+                                MouseEnter="ellipse_MouseEnter"
+                                MouseLeave="ellipse_MouseLeave"
+                                MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
+                                MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
+                                MouseMove="Ellipse_MouseMove"/>
                             <Ellipse Name="ellipseLB" Canvas.Left="0" Canvas.Bottom="0"
-                                         MouseEnter="ellipse_MouseEnter"
-                                         MouseLeave="ellipse_MouseLeave"
-                                         MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
-                                         MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
-                                         MouseMove="Ellipse_MouseMove"/>
-                            <Polygon Name="polygon" Stroke="Blue" StrokeThickness="2"/>
+                                MouseEnter="ellipse_MouseEnter"
+                                MouseLeave="ellipse_MouseLeave"
+                                MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
+                                MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
+                                MouseMove="Ellipse_MouseMove"/>
+                            <Polygon Name="polygon" Stroke="Blue"
+                                     StrokeThickness="{StaticResource StrokeThickness}" StrokeDashArray="3,5"/>
                         </Canvas>
                     </Grid>
                 </Viewbox>
@@ -127,7 +136,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Grid Grid.RowSpan="3" Grid.ColumnSpan="3">
-                            <Image Name="imgTransformed"/>
+                            <Image Name="imgTransformed" MouseMove="imgTransformed_MouseMove"/>
                             <Canvas>
                                 <Line Name="ruler0" X1="100" Y1="0" X2="100" Y2="400" Stroke="Blue" StrokeDashArray="3,5"/>
                                 <Line Name="ruler1" X1="300" Y1="0" X2="300" Y2="400" Stroke="Blue" StrokeDashArray="3,5"/>
