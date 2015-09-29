@@ -31,7 +31,7 @@ namespace HomographyMatrix
 
         private ViewModel vm;
 
-        /// <summary> 楕円の名前とpolygonのインデックスの対応 </summary>
+        /// <summary> 楕円のコレクション </summary>
         private List<Ellipse> ellipseDictionary;
         /// <summary> ドラッグ用．ドラッグ中か否か </summary>
         private bool isDrag = false;
@@ -43,6 +43,8 @@ namespace HomographyMatrix
         private double origStrokeThickness { get; set; }
         private double origTextBlockFontSize { get; set; }
 
+        private string saveFileName = "homographymatrix.txt";
+
         public MainWindow()
         {
             InitializeComponent();
@@ -51,7 +53,7 @@ namespace HomographyMatrix
             DataContext = vm = new ViewModel(canvas);
             origGridWidth = srcGrid.Width;
             origEllipseWidth = ellipseLT.Width;
-            origStrokeThickness = polygon.StrokeThickness;
+            origStrokeThickness = polyL.StrokeThickness;
             origTextBlockFontSize = txbLT.FontSize;
         }
 
@@ -80,6 +82,7 @@ namespace HomographyMatrix
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "*.txt | *.txt";
+            sfd.FileName = saveFileName;
             if(sfd.ShowDialog() == true)
             {
                 using (System.IO.StreamWriter sw = new System.IO.StreamWriter(sfd.FileName))
@@ -90,6 +93,7 @@ namespace HomographyMatrix
                     }
                 }
             }
+            saveFileName = System.IO.Path.GetFileName(sfd.FileName);
         }
 
         private void ellipse_MouseEnter(object sender, MouseEventArgs e)
@@ -141,8 +145,7 @@ namespace HomographyMatrix
                 SetCursorPos((int)cursorPos.X, (int)cursorPos.Y);
                 Canvas.SetLeft(el, pt.X - dragOffset.X);
                 Canvas.SetTop(el, pt.Y - dragOffset.Y);
-                polygon.Points[ellipseDictionary.IndexOf(el)]
-                    = new Point(Canvas.GetLeft(el) + ellipseLT.Width / 2, Canvas.GetTop(el) + ellipseLT.Width / 2);
+                ResetPolyLine();
             }
         }
 
@@ -221,13 +224,8 @@ namespace HomographyMatrix
             Canvas.SetTop(ellipseRB, ah34);
             Canvas.SetLeft(ellipseLB, aw14);
             Canvas.SetTop(ellipseLB, ah34);
-
-            polygon.Points = new PointCollection(4);
-            polygon.StrokeThickness = origStrokeThickness * gridWidth / origGridWidth;
-            polygon.Points.Add(new Point(Canvas.GetLeft(ellipseLT) + radius, Canvas.GetTop(ellipseLT) + radius));
-            polygon.Points.Add(new Point(Canvas.GetLeft(ellipseRT) + radius, Canvas.GetTop(ellipseRT) + radius));
-            polygon.Points.Add(new Point(Canvas.GetLeft(ellipseRB) + radius, Canvas.GetTop(ellipseRB) + radius));
-            polygon.Points.Add(new Point(Canvas.GetLeft(ellipseLB) + radius, Canvas.GetTop(ellipseLB) + radius));
+            polyL.StrokeThickness = polyR.StrokeThickness = polyT.StrokeThickness = polyB.StrokeThickness = origStrokeThickness * gridWidth / origGridWidth;
+            ResetPolyLine();
         }
 
         private void ResetRuler(double gridWidth)
@@ -247,6 +245,93 @@ namespace HomographyMatrix
             }
             txbLT.FontSize = origTextBlockFontSize * gridWidth / origGridWidth;
             txbRB.FontSize = origTextBlockFontSize * gridWidth / origGridWidth;
+        }
+
+        private void ResetPolyLine()
+        {
+            double radius = ellipseLT.Width / 2;
+            foreach (var o in new[]{
+                new {poly = polyL, e1 = ellipseLT, e2 = ellipseLB },
+                new {poly = polyR, e1 = ellipseRT, e2 = ellipseRB },
+                new {poly = polyT, e1 = ellipseLT, e2 = ellipseRT },
+                new {poly = polyB, e1 = ellipseLB, e2 = ellipseRB },
+            })
+            {
+                double e1l = Canvas.GetLeft(o.e1) + radius;
+                double e2l = Canvas.GetLeft(o.e2) + radius;
+                double e1t = Canvas.GetTop(o.e1) + radius;
+                double e2t = Canvas.GetTop(o.e2) + radius;
+                double dx = e2l - e1l;
+                double dy = e2t - e1t;
+                if (dx == 0)
+                {
+                    o.poly.X1 = o.poly.X2 = e1l;
+                    o.poly.Y1 = 0;
+                    o.poly.Y2 = srcGrid.Height;
+                }
+                else if (dy == 0)
+                {
+                    o.poly.Y1 = o.poly.Y2 = e1t;
+                    o.poly.X1 = 0;
+                    o.poly.X2 = srcGrid.Width;
+                }
+                else
+                {
+                    double a = (e1t - e2t) / (e1l - e2l);
+                    double b = (e1l * e2t - e2l * e1t) / (e1l - e2l);
+                    double c = a * srcGrid.Width + b;
+                    if (b < 0)
+                    {
+                        o.poly.X1 = -b / a;
+                        o.poly.Y1 = 0;
+                        if (c < srcGrid.Height)
+                        {
+                            o.poly.X2 = srcGrid.Width;
+                            o.poly.Y2 = c;
+                        }
+                        else
+                        {
+                            o.poly.X2 = (srcGrid.Height - b) / a;
+                            o.poly.Y2 = srcGrid.Height;
+                        }
+                    }
+                    else if (b > srcGrid.Height)
+                    {
+                        o.poly.X1 = (srcGrid.Height - b) / a;
+                        o.poly.Y1 = srcGrid.Height;
+                        if (c > 0)
+                        {
+                            o.poly.X2 = srcGrid.Width;
+                            o.poly.Y2 = c;
+                        }
+                        else
+                        {
+                            o.poly.X2 = -b / a;
+                            o.poly.Y2 = 0;
+                        }
+                    }
+                    else
+                    {
+                        o.poly.X1 = 0;
+                        o.poly.Y1 = b;
+                        if (c < 0)
+                        {
+                            o.poly.X2 = -b / a;
+                            o.poly.Y2 = 0;
+                        }
+                        else if (c > srcGrid.Height)
+                        {
+                            o.poly.X2 = (srcGrid.Height -b)/a;
+                            o.poly.Y2 = srcGrid.Height;
+                        }
+                        else
+                        {
+                            o.poly.X2 = srcGrid.Width;
+                            o.poly.Y2 = c;
+                        }
+                    }
+                }
+            }
         }
 
         private void OpenImage()

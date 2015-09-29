@@ -116,8 +116,10 @@
                                 MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"
                                 MouseLeftButtonUp="Ellipse_MouseLeftButtonUp"
                                 MouseMove="Ellipse_MouseMove"/>
-                            <Polygon Name="polygon" Stroke="Blue"
-                                     StrokeThickness="{StaticResource StrokeThickness}" StrokeDashArray="3,5"/>
+                            <Line Name="polyL" X1="100" Y1="0" X2="100" Y2="400" Stroke="Blue" StrokeDashArray="3,5"/>
+                            <Line Name="polyR" X1="300" Y1="0" X2="300" Y2="400" Stroke="Blue" StrokeDashArray="3,5"/>
+                            <Line Name="polyT" X1="0" Y1="100" X2="400" Y2="100" Stroke="Blue" StrokeDashArray="3,5"/>
+                            <Line Name="polyB" X1="0" Y1="300" X2="400" Y2="300" Stroke="Blue" StrokeDashArray="3,5"/>
                         </Canvas>
                     </Grid>
                 </Viewbox>
